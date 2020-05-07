@@ -16,7 +16,9 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", { useNewUrlParser: true });
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/workout";
+
+mongoose.connect(MONGODB_URI);
 
 // routes
 
@@ -56,27 +58,30 @@ app.get("/api/workouts/:id", (req, res) => {
 
 
 app.put("/api/workouts/:id", (req, res) => {
-  db.Workout.findByIdAndUpdate(req.params.id, { $push: { exercises: [req.body] } },
-    (err, data) => {
-      if (err) {
-        console.log(err);
-      }
-      else {
-        res.send(data);
-      }
-    });
+  db.Workout.update({ _id: req.params.id },
+    { $push: { exercises: req.body }, $inc: { totalDuration: req.body.duration } },
+    { new: true })
+    .then(data => {
+      res.json(data);
+    })
+    .catch(err => {
+      console.log("oops");
+      res.json(err);
+    })
+
 });
 
 // route for posting new workout
 app.post("/api/workouts", (req, res) => {
-  db.Workout.create({}, (err, data) => {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      res.send(data);
-    }
-  });
+  const workout = new db.Workout(req.body);
+  db.Workout.create(workout)
+    .then(data => {
+      res.json(data);
+    })
+    .catch(err => {
+      console.log("oops");
+      res.json(err);
+    });
 });
 
 
