@@ -27,4 +27,4 @@ https://guarded-stream-38068.herokuapp.com/
 
 
 ## Screenshot of Application
-![Screenshot of Application](/screenshot.png)
+![Screenshot of Application](/screenshot.PNG)
